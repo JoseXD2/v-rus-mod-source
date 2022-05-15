@@ -69,6 +69,8 @@ import lime.utils.Assets;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
+import ui.Mobilecontrols;
+
 #if cpp
 import Discord.DiscordClient;
 #end
@@ -294,7 +296,11 @@ class PlayState extends MusicBeatState
 	var songLowercase:String;
 
 	var specialmove:Bool = false;
-
+	
+        #if mobileC
+	var mcontrols:Mobilecontrols; 
+	#end
+		
 	// API stuff
 
 	public function addObject(object:FlxBasic)
@@ -1045,7 +1051,29 @@ class PlayState extends MusicBeatState
 		kadeEngineWatermark.cameras = [camHUD];
 		if (loadRep)
 			replayTxt.cameras = [camHUD];
+	
+                #if mobileC
+			mcontrols = new Mobilecontrols();
+			switch (mcontrols.mode)
+			{
+				case VIRTUALPAD_RIGHT | VIRTUALPAD_LEFT | VIRTUALPAD_CUSTOM:
+					controls.setVirtualPad(mcontrols._virtualPad, FULL, NONE);
+				case HITBOX:
+					controls.setHitBox(mcontrols._hitbox);
+				default:
+			}
+			trackedinputs = controls.trackedinputs;
+			controls.trackedinputs = [];
 
+			var camcontrol = new FlxCamera();
+			FlxG.cameras.add(camcontrol);
+			camcontrol.bgColor.alpha = 0;
+			mcontrols.cameras = [camcontrol];
+
+			mcontrols.visible = false;
+
+			add(mcontrols);
+		#end
 		// if (SONG.song == 'South')
 		// FlxG.camera.alpha = 0.7;
 		// UI_camera.zoom = 1;
@@ -1152,7 +1180,10 @@ class PlayState extends MusicBeatState
 	#end
 
 	function startCountdown():Void
-	{
+	{     
+		#if mobileC
+		mcontrols.visible = true;
+		#end
 		inCutscene = false;
 
 		appearStaticArrows();
