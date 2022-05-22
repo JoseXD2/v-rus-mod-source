@@ -328,7 +328,7 @@ class TitleState extends MusicBeatState
 					else
 					{*/
 						FlxG.switchState(new MainMenuState());
-						clean();/*
+						();/*
 					}
 				}
 				
